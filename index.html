@@ -1,1 +1,516 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Resh Cyber Net</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
 
+    html, body {
+      background-color: #000000;
+      color: #ffffff;
+      height: 100%;
+      min-height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #desktop-warning {
+      display: none;
+      text-align: center;
+      padding: 24px;
+      font-size: 1.1rem;
+      color: #a1a1a6;
+    }
+
+    @media (min-width: 768px) {
+      #app-container {
+        display: none !important;
+      }
+      #desktop-warning {
+        display: block;
+      }
+    }
+
+    #app-container {
+      width: 100%;
+      max-width: 480px;
+      height: 100dvh;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slider-wrapper {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fixed-profile-badge {
+      position: absolute;
+      top: calc(16px + env(safe-area-inset-top));
+      left: 16px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 6px 14px 6px 6px;
+      border-radius: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .profile-pic {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid #2ed573;
+    }
+
+    .business-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .business-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .business-tagline {
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .slides-container {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .slide-card {
+      min-width: 100%;
+      height: 100%;
+      padding: 20px 20px calc(80px + env(safe-area-inset-bottom)) 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .slide-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.5) 0%,
+        rgba(0, 0, 0, 0.05) 40%,
+        rgba(0, 0, 0, 0.75) 75%,
+        rgba(0, 0, 0, 0.95) 100%
+      );
+      z-index: 1;
+    }
+
+    .slide-bottom-content {
+      position: relative;
+      z-index: 2;
+      max-width: 78%;
+    }
+
+    .slide-title {
+      font-size: 1.65rem;
+      font-weight: 700;
+      line-height: 1.25;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+    }
+
+    .slide-desc {
+      font-size: 0.95rem;
+      color: #d1d1d6;
+      margin-top: 8px;
+      line-height: 1.4;
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+    }
+
+    /* बॉटम-राइट सोशल, लोकेशन और कॉल आइकन्स */
+    .quick-social-actions {
+      position: absolute;
+      right: 14px;
+      bottom: calc(75px + env(safe-area-inset-bottom));
+      z-index: 15;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .action-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .action-icon-btn:active {
+      transform: scale(0.9);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .action-icon-btn svg {
+      width: 19px;
+      height: 19px;
+      fill: currentColor;
+    }
+
+    .bottom-controls {
+      position: absolute;
+      bottom: calc(16px + env(safe-area-inset-bottom));
+      left: 0;
+      width: 100%;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .dots-pill-container, .pause-btn {
+      pointer-events: auto;
+    }
+
+    .dots-pill-container {
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 7px 14px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      background-color: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .dot.active {
+      width: 28px;
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .dot-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 0%;
+      background-color: #ffffff;
+      border-radius: 10px;
+    }
+
+    .pause-btn {
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: white;
+    }
+
+    .pause-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="desktop-warning">
+    <h2>📱 केवल मोबाइल डिवाइस</h2>
+    <p style="margin-top: 8px;">कृपया इस पेज को अपने मोबाइल में खोलें।</p>
+  </div>
+
+  <div id="app-container">
+    <div class="slider-wrapper" id="sliderWrapper">
+      
+      <!-- स्थिर प्रोफाइल बैज -->
+      <div class="fixed-profile-badge">
+        <img src="https://lh3.googleusercontent.com/a-/ALV-UjVuOdrzwAHHdJnApD6A-ip1O9hKklPpg0DSE0YdeyyZH9UT0Day=w1394" alt="Logo" class="profile-pic">
+        <div class="business-info">
+          <span class="business-name">Resh Cyber Net</span>
+          <span class="business-tagline">Official Partner</span>
+        </div>
+      </div>
+
+      <!-- बॉटम-राइट सोशल, लोकेशन और कॉल आइकन्स -->
+      <div class="quick-social-actions">
+        <!-- Google Business / Maps Location -->
+        <a href="https://maps.google.com/?q=Resh+Cyber+Net" target="_blank" rel="noopener noreferrer" class="action-icon-btn" aria-label="Google Business Location">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
+        </a>
+
+        <!-- WhatsApp -->
+        <a href="https://wa.me/91XXXXXXXXXX" target="_blank" rel="noopener noreferrer" class="action-icon-btn" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24">
+            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67M9.53 7.37C9.37 7.37 9.11 7.43 8.89 7.67C8.67 7.91 8.07 8.47 8.07 9.63C8.07 10.79 8.91 11.91 9.03 12.07C9.15 12.23 10.67 14.57 13 15.57C13.56 15.81 13.99 15.96 14.33 16.07C14.89 16.25 15.4 16.22 15.81 16.16C16.26 16.09 17.21 15.59 17.41 15.03C17.61 14.47 17.61 13.99 17.55 13.89C17.49 13.79 17.34 13.73 17.11 13.62C16.89 13.5 15.78 12.95 15.57 12.87C15.36 12.79 15.21 12.75 15.06 12.99C14.91 13.23 14.48 13.73 14.35 13.89C14.22 14.05 14.09 14.07 13.86 13.95C13.64 13.84 12.91 13.6 12.04 12.82C11.36 12.21 10.9 11.46 10.77 11.23C10.64 11.01 10.76 10.89 10.87 10.78C10.97 10.68 11.09 10.52 11.21 10.38C11.33 10.24 11.37 10.14 11.45 9.98C11.53 9.82 11.49 9.68 11.43 9.56C11.37 9.44 10.82 8.09 10.59 7.55C10.37 7.02 10.14 7.09 9.97 7.09C9.82 7.08 9.65 7.08 9.53 7.37Z"/>
+          </svg>
+        </a>
+
+        <!-- Instagram -->
+        <a href="https://instagram.com/yourhandle" target="_blank" rel="noopener noreferrer" class="action-icon-btn" aria-label="Instagram">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>
+        </a>
+
+        <!-- Facebook -->
+        <a href="https://facebook.com/yourpage" target="_blank" rel="noopener noreferrer" class="action-icon-btn" aria-label="Facebook">
+          <svg viewBox="0 0 24 24">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+        </a>
+
+        <!-- Call -->
+        <a href="tel:+91XXXXXXXXXX" class="action-icon-btn" aria-label="Call">
+          <svg viewBox="0 0 24 24">
+            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- फुल स्क्रीन स्लाइड्स -->
+      <div class="slides-container" id="slidesContainer">
+        
+        <div class="slide-card" style="background-image: url('https://lh3.googleusercontent.com/pw/AP1GczMowBfEonrrhuwX_p2YsCM7zQC2r4GM8rnyC6XCZMDAC9BKQZjUQn8LgHAOa_-CH81w1Qdmzr7m2VqY5mYYfLRIJwb7tpNxErjcXKdmbyVUsNlWJFaJ3kgGPdvL1VdtOobjln7IxP8jHdUMmyoWR9Oz=w525-h919-s-no');">
+          <div class="slide-bottom-content">
+            <h2 class="slide-title">BED</h2>
+            <p class="slide-desc">Comfort for a Better Tomorrow.</p>
+          </div>
+        </div>
+
+        <div class="slide-card" style="background-image: url('https://lh3.googleusercontent.com/pw/AP1GczOv_koaB4hCRtrmnK-KgR0cT1gkBFZEDV0MygI8ylR2EuINu7frzU-DMMiE7ErVGv0v4i3dq0aXLCTbAXdprC0lGLt6R1QMt_LWjO5RVBrPzWrkG2DyRugVqDGqrduwRDfuA1yu4hTph0R3hqdH8Fms=w540-h945-s-no-gm?authuser=0');">
+          <div class="slide-bottom-content">
+            <h2 class="slide-title">SOFA</h2>
+            <p class="slide-desc">Relax | Recharge | Reconnect.</p>
+          </div>
+        </div>
+
+        <div class="slide-card" style="background-image: url('https://lh3.googleusercontent.com/pw/AP1GczOM0CmiDCCDXPvODjnwaoCO4jcfiu34BRkgW32qDaVO7ZbC9L9r7aPW0LQY_AWFP2ktvYrgMGipFtQOqkYnnNH5YMtINgY7ok_jhhZeSg8WNj1g5gPQthPZ_qiV1OO2JYIgZysZNi0MLhIVhczqQvzg=w540-h945-s-no-gm?authuser=0');">
+          <div class="slide-bottom-content">
+            <h2 class="slide-title">DINING TABLE</h2>
+            <p class="slide-desc">Meals Taste Better Together.</p>
+          </div>
+        </div>
+
+        <div class="slide-card" style="background-image: url('https://lh3.googleusercontent.com/pw/AP1GczM_HgInck2FQujKxeZH9n4GITAIVZpXc-_ucymawOKy4EOriuTDYzVb0Lof02eCbOw4potKM_wIgSqBla03Szvx49N5-MAKsfNo9G3BJZOCS6bmc3GHjEE2o8BQg6N3rMHk9nnNGN2yy5CK8MxgWsjy=w540-h945-s-no-gm?authuser=0');">
+          <div class="slide-bottom-content">
+            <h2 class="slide-title">WARDROBE</h2>
+            <p class="slide-desc">More Space, More Possibilities.</p>
+          </div>
+        </div>
+
+        <div class="slide-card" style="background-image: url('https://lh3.googleusercontent.com/pw/AP1GczOH0b5FI5z750iGWeSmWNxruLGe_xGeuRAUP2aX67nFumeNdgd-vZ_nssYCh7Xpue9ymSnNGKMocD9yT48eolY9X8m9cJY8MRXScKWqvbzWDBCM7ZlF4e-8EzRfMoXXtVLHAxIks7eKt9Vf03Wbk0MQ=w540-h945-s-no-gm?authuser=0');">
+          <div class="slide-bottom-content">
+            <h2 class="slide-title">STUDY TABLE</h2>
+            <p class="slide-desc">Focus Today, Build Tomorrow.</p>
+          </div>
+        </div>
+
+        <div class="slide-card" style="background-image: url('https://lh3.googleusercontent.com/pw/AP1GczNH-LHdaDUsgx-cZCEr5Eh-Jj_RGOWLgPrR1spTozxbf37kdAXL30WsfySeStFAGXuh3eVWjspsnFEmmBY383INnnYU6R4smyMAScaeu-r8TViUQHJWaykgYS23q6xsud0KKSz_kCEGV61IU8VZGnHZ=w540-h945-s-no-gm?authuser=0');">
+          <div class="slide-bottom-content">
+            <h2 class="slide-title">TV UNIT</h2>
+            <p class="slide-desc">Entertainment Looks Better Here.</p>
+          </div>
+        </div>
+
+        <div class="slide-card" style="background-image: url('https://lh3.googleusercontent.com/pw/AP1GczMaFrfY-0dnIFSn0gPsK0HvYSjk_lAZqn--nUT6XD0b0C1eGnAW9Nul_PQSoVyCfoQx4rDnoEZ6E0P6t_LXfb3EpURk7oTLG0x8qo68OitLH20ngeQLOLoFwkiAro5tZBR_2xQJPVziPRXLC1KL-L6y=w540-h945-s-no-gm?authuser=0');">
+          <div class="slide-bottom-content">
+            <h2 class="slide-title">COFFEE TABLE</h2>
+            <p class="slide-desc">Small Table, Big Conversations.</p>
+          </div>
+        </div>
+
+        <div class="slide-card" style="background-image: url('https://lh3.googleusercontent.com/pw/AP1GczNiDkLa3sZIIU-S9ylbfUspG90DTc0IOC5JhA9qHrPcKFJqdJbNs5p1eO38s_xyLBxbibagB8zhi-u0I4vu1JVsHRBxMeyZvpwmAAkzs7SBShcBiNL2bKR5SxMBjEW83lYAAlZ1jH_cJDEtyazUW-8V=w540-h945-s-no-gm?authuser=0');">
+          <div class="slide-bottom-content">
+            <h2 class="slide-title">MATTRESS</h2>
+            <p class="slide-desc">Good Sleep, Brighter Days.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- बॉटम कंट्रोल्स -->
+      <div class="bottom-controls">
+        <div class="dots-pill-container" id="dotsContainer"></div>
+        <button class="pause-btn" id="togglePlayBtn" aria-label="Pause or Play">
+          <svg id="pauseIcon" viewBox="0 0 24 24">
+            <rect x="6" y="4" width="4" height="16" rx="1.5"></rect>
+            <rect x="14" y="4" width="4" height="16" rx="1.5"></rect>
+          </svg>
+          <svg id="playIcon" viewBox="0 0 24 24" style="display: none; margin-left: 2px;">
+            <polygon points="5,3 19,12 5,21"></polygon>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const SLIDE_DURATION = 4000;
+    const slides = document.querySelectorAll('.slide-card');
+    const totalSlides = slides.length;
+    const slidesContainer = document.getElementById('slidesContainer');
+    const dotsContainer = document.getElementById('dotsContainer');
+    const togglePlayBtn = document.getElementById('togglePlayBtn');
+    const pauseIcon = document.getElementById('pauseIcon');
+    const playIcon = document.getElementById('playIcon');
+    const sliderWrapper = document.getElementById('sliderWrapper');
+
+    let currentIndex = 0;
+    let isPaused = false;
+    let startTime = null;
+    let animationFrameId = null;
+    let elapsedBeforePause = 0;
+
+    slides.forEach((_, idx) => {
+      const dot = document.createElement('div');
+      dot.classList.add('dot');
+      if (idx === 0) dot.classList.add('active');
+      
+      const fill = document.createElement('div');
+      fill.classList.add('dot-fill');
+      dot.appendChild(fill);
+
+      dot.addEventListener('click', () => goToSlide(idx));
+      dotsContainer.appendChild(dot);
+    });
+
+    const dots = document.querySelectorAll('.dot');
+
+    function goToSlide(index) {
+      currentIndex = index;
+      slidesContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+      dots.forEach((dot, idx) => {
+        const fill = dot.querySelector('.dot-fill');
+        dot.classList.remove('active');
+        fill.style.width = '0%';
+        if (idx < currentIndex) {
+          fill.style.width = '100%';
+        }
+      });
+
+      dots[currentIndex].classList.add('active');
+      elapsedBeforePause = 0;
+      startTime = performance.now();
+    }
+
+    function stepAnimation(timestamp) {
+      if (!startTime) startTime = timestamp;
+
+      if (!isPaused) {
+        const totalElapsed = (timestamp - startTime) + elapsedBeforePause;
+        const progress = Math.min((totalElapsed / SLIDE_DURATION) * 100, 100);
+
+        const currentFill = dots[currentIndex]?.querySelector('.dot-fill');
+        if (currentFill) {
+          currentFill.style.width = `${progress}%`;
+        }
+
+        if (totalElapsed >= SLIDE_DURATION) {
+          goToSlide((currentIndex + 1) % totalSlides);
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(stepAnimation);
+    }
+
+    animationFrameId = requestAnimationFrame(stepAnimation);
+
+    togglePlayBtn.addEventListener('click', () => {
+      isPaused = !isPaused;
+      if (isPaused) {
+        elapsedBeforePause += performance.now() - startTime;
+        pauseIcon.style.display = 'none';
+        playIcon.style.display = 'block';
+      } else {
+        startTime = performance.now();
+        pauseIcon.style.display = 'block';
+        playIcon.style.display = 'none';
+      }
+    });
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    sliderWrapper.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    sliderWrapper.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      const diff = touchStartX - touchEndX;
+      if (Math.abs(diff) > 45) {
+        if (diff > 0) {
+          goToSlide((currentIndex + 1) % totalSlides);
+        } else {
+          goToSlide((currentIndex - 1 + totalSlides) % totalSlides);
+        }
+      }
+    }, { passive: true });
+  </script>
+</body>
+</html>
